@@ -1,9 +1,31 @@
-// Fungsi untuk mendeteksi apakah perangkat adalah desktop (dengan lebar layar > 1024px)
+// Ambil elemen sidebar dan tombol toggle
+const sidebar = document.getElementById('sidebar');
+const toggleNavBtn = document.getElementById('toggle-nav-btn');
+let isNavOpen = false;
+
+// Fungsi untuk membuka/tutup navigasi
+function toggleNav() {
+    isNavOpen = !isNavOpen;
+    if (isNavOpen) {
+        sidebar.classList.remove('nav-hidden');
+        sidebar.classList.add('nav-visible');
+        toggleNavBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
+    } else {
+        sidebar.classList.remove('nav-visible');
+        sidebar.classList.add('nav-hidden');
+        toggleNavBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
+    }
+}
+
+// Tambahkan event listener untuk tombol toggle
+toggleNavBtn.addEventListener('click', toggleNav);
+
+// Fungsi untuk mendeteksi apakah perangkat adalah desktop
 function isDesktop() {
     return window.innerWidth > 1024;
 }
 
-// Jika perangkat adalah desktop, tampilkan peringatan
+// Peringatan untuk desktop
 if (isDesktop()) {
     Swal.fire({
         title: 'Tidak berfungsi di desktop',
@@ -20,7 +42,7 @@ if (isDesktop()) {
     });
 }
 
-// Data Warga di localStorage
+// Data warga di localStorage
 let dataWarga = JSON.parse(localStorage.getItem('dataWarga')) || [];
 
 // Ambil referensi elemen DOM
@@ -59,7 +81,7 @@ function displayData(filteredData = dataWarga) {
             <p>Keterangan: ${warga.keterangan}</p>
         `;
 
-        // Tombol hapus dengan swipe (akan dikembangkan nanti)
+        // Tombol hapus dengan swipe
         const deleteBtn = document.createElement('button');
         deleteBtn.classList.add('text-red-500', 'absolute', 'top-2', 'right-2');
         deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
@@ -71,6 +93,7 @@ function displayData(filteredData = dataWarga) {
 
     // Perbarui penghitung
     updateCounter();
+    handleSwipe(); // Panggil fungsi handleSwipe setelah menampilkan data
 }
 
 // Fungsi untuk menambahkan anggota keluarga baru di form
@@ -152,7 +175,7 @@ function hapusWarga(index) {
         cancelButtonText: 'Batal'
     }).then((result) => {
         if (result.isConfirmed) {
-            dataWarga.splice(index, 1);
+            dataWarga.splice(index, 1); // Menghapus hanya satu cardbox
             localStorage.setItem('dataWarga', JSON.stringify(dataWarga));
             displayData();
 
@@ -166,8 +189,30 @@ function hapusWarga(index) {
     });
 }
 
-// Panggil fungsi untuk menampilkan data awal saat halaman diakses
-displayData();
+// Fungsi hapus semua data
+deleteAllBtn.addEventListener('click', () => {
+    Swal.fire({
+        title: 'Konfirmasi Hapus',
+        text: 'Apakah Anda yakin ingin menghapus semua data?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Hapus',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            dataWarga = []; // Menghapus semua data
+            localStorage.removeItem('dataWarga');
+            displayData();
+
+            Swal.fire({
+                icon: 'success',
+                title: 'Sukses!',
+                text: 'Semua data berhasil dihapus.',
+                confirmButtonText: 'OK'
+            });
+        }
+    });
+});
 
 // Fungsi untuk mengimpor data dari file JSON
 importBtn.addEventListener('change', (e) => {
@@ -296,27 +341,27 @@ function updateWarga(index) {
     });
 }
 
-// Fitur hapus semua data
-deleteAllBtn.addEventListener('click', () => {
-    Swal.fire({
-        title: 'Konfirmasi Hapus',
-        text: 'Apakah Anda yakin ingin menghapus semua data?',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Hapus',
-        cancelButtonText: 'Batal'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            dataWarga = [];
-            localStorage.removeItem('dataWarga');
-            displayData();
+// Swipe detection for mobile (touch events)
+let touchStartX = 0;
+let touchEndX = 0;
 
-            Swal.fire({
-                icon: 'success',
-                title: 'Sukses!',
-                text: 'Semua data berhasil dihapus.',
-                confirmButtonText: 'OK'
-            });
-        }
+// Fungsi untuk mendeteksi swipe ke kanan untuk menghapus cardbox
+function handleSwipe() {
+    const cards = document.querySelectorAll('#card-container > div');
+    cards.forEach((card, index) => {
+        card.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+
+        card.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            if (touchStartX < touchEndX - 50) {
+                // Swipe ke kanan (hapus card)
+                hapusWarga(index);
+            }
+        });
     });
-});
+}
+
+// Panggil fungsi untuk menampilkan data awal saat halaman diakses
+displayData();
