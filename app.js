@@ -66,6 +66,33 @@ const exportBtn = document.getElementById('export-btn');
 const importBtn = document.getElementById('import-btn');
 const deleteAllBtn = document.getElementById('delete-all-btn');
 
+// Ambil elemen input dan elemen himbauan untuk Nomor KK
+const nomorKKInput = document.getElementById('nomor-kk');
+const kkHimbauan = document.getElementById('kk-himbauan');
+const nomorNIKInput = document.getElementById('nik-number');
+const nikHimbauan = document.getElementById('nik-himbauan');
+
+nomorNIKInput.addEventListener('input', function() {
+    if (this.value.length > 16) {
+        this.classList.add('border-red-500'); // Tambah warna merah pada border
+        nikHimbauan.classList.remove('hidden'); // Tampilkan himbauan
+    } else {
+        this.classList.remove('border-red-500'); // Hapus warna merah jika panjang sudah sesuai
+        nikHimbauan.classList.add('hidden'); // Sembunyikan himbauan jika sudah sesuai
+    }
+});
+
+// Fungsi untuk mengecek panjang input Nomor KK
+nomorKKInput.addEventListener('input', function() {
+    if (this.value.length > 16) {
+        this.classList.add('border-red-500');  // Tambah warna merah pada border
+        kkHimbauan.classList.remove('hidden');  // Tampilkan himbauan
+    } else {
+        this.classList.remove('border-red-500');  // Hapus warna merah jika sudah benar
+        kkHimbauan.classList.add('hidden');  // Sembunyikan himbauan
+    }
+});
+
 // Fungsi untuk memperbarui penghitung jumlah data
 function updateCounter() {
     dataCounter.textContent = `Jumlah Data: ${dataWarga.length}`;
@@ -106,17 +133,45 @@ function displayData(filteredData = dataWarga) {
 // Fungsi untuk menambahkan anggota keluarga baru di form
 tambahAnggotaBtn.addEventListener('click', () => {
     const anggotaDiv = document.createElement('div');
-    anggotaDiv.classList.add('flex', 'mb-2');
+    anggotaDiv.classList.add('flex', 'mb-2', 'flex-col');
     anggotaDiv.innerHTML = `
-        <input type="text" placeholder="Nama Anggota Keluarga" class="anggota-nama w-3/5 p-2 border rounded mr-2" style="text-transform: uppercase">
-        <input type="number" placeholder="NIK" class="anggota-nik w-2/5 p-2 border rounded">
+        <div class="flex">
+            <input type="text" placeholder="Nama Anggota Keluarga" class="anggota-nama w-3/5 p-2 border rounded mr-2" style="text-transform: uppercase">
+            <input type="number" placeholder="NIK" class="anggota-nik w-2/5 p-2 border rounded" maxlength="16">
+        </div>
+        <div class="nik-himbauan text-red-500 text-sm hidden">NIK tidak boleh lebih dari 16 digit!</div>
     `;
     anggotaContainer.appendChild(anggotaDiv);
+
+    // Tambahkan event listener untuk validasi NIK
+    const inputNik = anggotaDiv.querySelector('.anggota-nik');
+    const nikHimbauan = anggotaDiv.querySelector('.nik-himbauan');
+
+    inputNik.addEventListener('input', function() {
+        if (this.value.length > 16) {
+            this.classList.add('border-red-500'); // Tambah warna merah pada border
+            nikHimbauan.classList.remove('hidden'); // Tampilkan himbauan
+        } else {
+            this.classList.remove('border-red-500'); // Hapus warna merah jika panjang sudah sesuai
+            nikHimbauan.classList.add('hidden'); // Sembunyikan himbauan jika sudah sesuai
+        }
+    });
 });
 
 // Fungsi untuk menyimpan data ke localStorage
 formWarga.addEventListener('submit', (e) => {
     e.preventDefault();
+
+    // Validasi NIK Anggota Keluarga
+    let valid = true;
+    document.querySelectorAll('.anggota-nik').forEach((inputNik) => {
+        if (inputNik.value.length > 16) {
+            inputNik.classList.add('border-red-500');  // Tambah warna merah jika NIK tidak valid
+            valid = false;
+        } else {
+            inputNik.classList.remove('border-red-500');  // Hapus warna merah jika sudah benar
+        }
+    });
 
     const namaKepala = document.getElementById('nama-kepala').value;
     const nomorKK = document.getElementById('nomor-kk').value;
@@ -286,13 +341,30 @@ function editWarga(index) {
 
     warga.anggotaList.forEach(anggota => {
         const anggotaDiv = document.createElement('div');
-        anggotaDiv.classList.add('flex', 'mb-2');
+        anggotaDiv.classList.add('flex', 'mb-2', 'flex-col');
         anggotaDiv.innerHTML = `
-            <input type="text" value="${anggota.nama}" class="anggota-nama w-3/5 p-2 border rounded mr-2">
-            <input type="text" value="${anggota.nik}" class="anggota-nik w-2/5 p-2 border rounded">
+            <div class="flex">
+                <input type="text" value="${anggota.nama}" class="anggota-nama w-3/5 p-2 border rounded mr-2" style="text-transform: uppercase">
+                <input type="number" value="${anggota.nik}" class="anggota-nik w-2/5 p-2 border rounded" maxlength="16">
+            </div>
+            <div class="nik-himbauan text-red-500 text-sm hidden">NIK tidak boleh lebih dari 16 digit!</div>
         `;
         anggotaContainer.appendChild(anggotaDiv);
-    });
+    
+        // Tambahkan event listener untuk validasi NIK
+        const inputNik = anggotaDiv.querySelector('.anggota-nik');
+        const nikHimbauan = anggotaDiv.querySelector('.nik-himbauan');
+    
+        inputNik.addEventListener('input', function() {
+            if (this.value.length > 16) {
+                this.classList.add('border-red-500'); // Tambah warna merah pada border
+                nikHimbauan.classList.remove('hidden'); // Tampilkan himbauan
+            } else {
+                this.classList.remove('border-red-500'); // Hapus warna merah jika panjang sudah sesuai
+                nikHimbauan.classList.add('hidden'); // Sembunyikan himbauan jika sudah sesuai
+            }
+        });
+    });       
 
     // Tambahkan event listener untuk menyimpan perubahan
     formWarga.onsubmit = (e) => {
