@@ -87,7 +87,7 @@ function displayData(filteredData = dataWarga) {
                 `).join('')}
             </ul>
             <p class="mt-2">Alamat: ${warga.alamat}</p>
-            <p>Keterangan: ${warga.keterangan}</p>
+            <p class="text-gray-500 dark:text-gray-400">Keterangan: ${warga.keterangan}</p>
             <button class="text-blue-500" onclick="editWarga(${index})">
                 <i class="fas fa-edit"></i>
             </button>
