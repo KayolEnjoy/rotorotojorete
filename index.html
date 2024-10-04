@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Warga</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script src="app.js" defer></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.3.2/html2canvas.min.js"></script>
+    <style>
+        /* Custom styles for smooth transitions */
+        .blur-lg {
+            backdrop-filter: blur(10px);
+        }
+        .nav-hidden {
+            transform: translateX(-100%);
+        }
+
+        .nav-visible {
+            transform: translateX(0);
+        }
+
+        .transition-all {
+            transition: transform 0.3s ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <!-- Tombol Panah Kecil di Kiri Bawah (Smartphone/Tablet) -->
+    <button id="toggle-nav-btn" class="fixed left-0 bottom-4 p-2 bg-blue-500 text-white rounded-full z-50 lg:hidden">
+        <i class="fas fa-chevron-right"></i>
+    </button>
+
+    <!-- Sidebar Navigasi (responsif, akan muncul di atas konten lain pada mobile) -->
+    <div id="sidebar" class="fixed top-0 left-0 w-64 h-full bg-white shadow-lg p-4 z-40 transition-all nav-hidden lg:nav-visible lg:static lg:shadow-none">
+        <h1 class="text-2xl font-bold mb-4">Aplikasi Pendataan Warga</h1>
+        <!-- Formulir input data warga -->
+        <form id="form-warga" class="mt-6">
+            <h2 class="text-lg font-semibold mb-4">Tambah Data Warga</h2>
+            <input type="text" id="nama-kepala" placeholder="Nama Kepala Keluarga" class="w-full p-2 mb-2 border rounded" required>
+            <input type="text" id="nomor-kk" placeholder="Nomor KK" class="w-full p-2 mb-2 border rounded" required>
+            <div id="anggota-container">
+                <div class="flex mb-2">
+                    <input type="text" placeholder="Nama Anggota Keluarga" class="anggota-nama w-3/5 p-2 border rounded mr-2">
+                    <input type="text" placeholder="NIK" class="anggota-nik w-2/5 p-2 border rounded">
+                </div>
+            </div>
+            <button type="button" id="tambah-anggota" class="text-blue-500">Tambah Anggota Keluarga</button>
+            <input type="text" id="alamat" placeholder="Alamat" class="w-full p-2 mb-2 border rounded" required>
+            <input type="text" id="keterangan" placeholder="Keterangan" class="w-full p-2 mb-4 border rounded">
+            <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded">Tambahkan Keluarga</button>
+        </form>
+        <button class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded w-full">Tambah Warga</button>
+        <button class="bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded w-full mt-2">Ekspor Data</button>
+        <button class="bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded w-full mt-2">Impor Data</button>
+        <button class="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded w-full mt-2">Hapus Semua Data</button>
+    </div>
+
+    <!-- Konten Utama -->
+    <div id="main-content" class="ml-0 lg:ml-64 p-6 transition-all">
+        <input type="text" id="search" class="p-3 w-full mb-6 rounded shadow-lg" placeholder="Cari data warga...">
+        <div id="card-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Cardbox warga akan ditambahkan di sini -->
+            <button class="text-blue-500 absolute bottom-2 right-2" onclick="saveCardAsImage(this.closest('div'))"><i class="fas fa-download"></i></button>
+        </div>
+    </div>
+
+</body>
+</html>
