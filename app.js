@@ -50,6 +50,74 @@ function displayData(filteredData = dataWarga) {
         // Tambahkan logika untuk menampilkan card
     });
 }
+function setupLongPressForEditing(cardElement, warga, index) {
+    let pressTimer;
+    const animationDuration = 4000; // 4 detik untuk deteksi long-press
+    let startTime;
+
+    cardElement.addEventListener('mousedown', (e) => {
+        startTime = Date.now();
+        pressTimer = setTimeout(() => {
+            // Tampilkan pop-up edit data dengan SweetAlert setelah 4 detik
+            Swal.fire({
+                title: 'Edit Data Warga',
+                html: `
+                    <input id="edit-nama" class="swal2-input" value="${warga.namaKepala}" placeholder="Nama Kepala Keluarga">
+                    <input id="edit-nokk" class="swal2-input" value="${warga.nomorKK}" placeholder="Nomor KK">
+                    <input id="edit-alamat" class="swal2-input" value="${warga.alamat}" placeholder="Alamat">
+                    <textarea id="edit-keterangan" class="swal2-textarea" placeholder="Keterangan">${warga.keterangan}</textarea>
+                `,
+                confirmButtonText: 'Simpan',
+                preConfirm: () => {
+                    return {
+                        namaKepala: document.getElementById('edit-nama').value,
+                        nomorKK: document.getElementById('edit-nokk').value,
+                        alamat: document.getElementById('edit-alamat').value,
+                        keterangan: document.getElementById('edit-keterangan').value
+                    };
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Update data warga di localStorage
+                    dataWarga[index] = {
+                        ...dataWarga[index],
+                        namaKepala: result.value.namaKepala,
+                        nomorKK: result.value.nomorKK,
+                        alamat: result.value.alamat,
+                        keterangan: result.value.keterangan
+                    };
+                    localStorage.setItem('dataWarga', JSON.stringify(dataWarga));
+                    displayData(); // Refresh cardbox setelah di-edit
+                }
+            });
+        }, animationDuration);
+
+        // Animasi perubahan warna saat long-press
+        let animationFrame;
+        function animate() {
+            const elapsed = Date.now() - startTime;
+            const progress = Math.min(elapsed / animationDuration, 1);
+            cardElement.style.backgroundColor = `rgba(173, 216, 230, ${progress})`; // Biru muda seiring waktu
+            if (progress < 1) {
+                animationFrame = requestAnimationFrame(animate);
+            }
+        }
+        animate();
+    });
+
+    cardElement.addEventListener('mouseup', (e) => {
+        clearTimeout(pressTimer);
+        cancelAnimationFrame(animationFrame); // Hentikan animasi
+        cardElement.style.backgroundColor = ''; // Reset warna
+    });
+
+    cardElement.addEventListener('mouseleave', (e) => {
+        clearTimeout(pressTimer);
+        cancelAnimationFrame(animationFrame); // Hentikan animasi jika mouse keluar
+        cardElement.style.backgroundColor = ''; // Reset warna
+    });
+}
+
 
 
 // Ambil referensi elemen formulir
