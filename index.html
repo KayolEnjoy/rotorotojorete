@@ -64,13 +64,15 @@
         <form id="form-warga" class="mt-6">
             <h2 class="text-lg font-semibold mb-4">Tambah Data Warga</h2>
             <input type="text" id="nama-kepala" placeholder="Nama Kepala Keluarga" class="w-full p-2 mb-2 border rounded" style="text-transform: uppercase" required>
-            <input type="number" id="nomor-kk" placeholder="Nomor KK" class="w-full p-2 mb-2 border rounded" required>
+            <input type="number" id="nomor-kk" placeholder="Nomor KK" class="w-full p-2 mb-2 border rounded" maxlength="16" required>
+            <div id="kk-himbauan" class="text-red-500 text-sm hidden">Nomor KK tidak boleh lebih dari 16 digit!</div>
             
             <div id="anggota-container">
                 <div class="flex mb-2">
-                    <input type="text" placeholder="Nama Anggota" class="anggota-nama w-3/5 p-2 border rounded mr-2" style="text-transform: uppercase">
-                    <input type="number" placeholder="No.NIK" class="anggota-nik w-2/5 p-2 border rounded">
+                    <input type="text" placeholder="Nama Anggota Keluarga" class="anggota-nama w-3/5 p-2 border rounded mr-2" style="text-transform: uppercase">
+                    <input type="number" id="nik-number" placeholder="NIK" class="anggota-nik w-2/5 p-2 border rounded" maxlength="16">
                 </div>
+                <div id="nik-himbauan" class="nik-himbauan text-red-500 text-sm hidden">NIK tidak boleh lebih dari 16 digit!</div>
             </div>
             
             <button type="button" id="tambah-anggota" class="text-blue-500">Tambah Anggota Keluarga</button>
