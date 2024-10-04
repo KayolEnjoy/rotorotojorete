@@ -88,11 +88,11 @@ function displayData(filteredData = dataWarga) {
             </ul>
             <p class="mt-2">Alamat: ${warga.alamat}</p>
             <p class="text-gray-500 dark:text-gray-400">Keterangan: ${warga.keterangan}</p>
-            <button class="text-blue-500" onclick="editWarga(${index})">
-                <i class="fas fa-edit"></i>
+            <button class="bg-blue-500 text-white py-2 px-4 rounded w-full mt-2" onclick="editWarga(${index})">
+                <i class="fas fa-edit"></i> Edit Warga
             </button>
-            <button class="text-red-500" onclick="hapusWarga(${index})">
-                <i class="fas fa-trash"></i>
+            <button class="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded w-full mt-2" onclick="hapusWarga(${index})">
+                <i class="fas fa-trash"></i> Hapus Warga
             </button>
         `;
 
