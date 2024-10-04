@@ -108,8 +108,8 @@ tambahAnggotaBtn.addEventListener('click', () => {
     const anggotaDiv = document.createElement('div');
     anggotaDiv.classList.add('flex', 'mb-2');
     anggotaDiv.innerHTML = `
-        <input type="text" placeholder="Nama Anggota Keluarga" class="anggota-nama w-3/5 p-2 border rounded mr-2">
-        <input type="text" placeholder="NIK" class="anggota-nik w-2/5 p-2 border rounded">
+        <input type="text" placeholder="Nama Anggota Keluarga" class="anggota-nama w-3/5 p-2 border rounded mr-2" style="text-transform: uppercase">
+        <input type="number" placeholder="NIK" class="anggota-nik w-2/5 p-2 border rounded">
     `;
     anggotaContainer.appendChild(anggotaDiv);
 });
