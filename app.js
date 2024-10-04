@@ -26,6 +26,32 @@ if (isDesktop()) {
     });
 }
 
+const searchInput = document.getElementById('search-input');
+
+searchInput.addEventListener('input', () => {
+    const searchTerm = searchInput.value.toLowerCase();
+    const filteredData = dataWarga.filter(warga => 
+        warga.namaKepala.toLowerCase().includes(searchTerm) ||
+        warga.nomorKK.toLowerCase().includes(searchTerm) ||
+        warga.alamat.toLowerCase().includes(searchTerm) ||
+        warga.keterangan.toLowerCase().includes(searchTerm) ||
+        warga.anggotaList.some(anggota => anggota.nama.toLowerCase().includes(searchTerm))
+    );
+
+    displayData(filteredData);
+});
+
+// Modifikasi fungsi displayData untuk menerima parameter
+function displayData(filteredData = dataWarga) {
+    cardContainer.innerHTML = '';
+
+    filteredData.forEach((warga, index) => {
+        // Sama seperti sebelumnya
+        // Tambahkan logika untuk menampilkan card
+    });
+}
+
+
 // Ambil referensi elemen formulir
 const formWarga = document.getElementById('form-warga');
 const anggotaContainer = document.getElementById('anggota-container');
@@ -70,8 +96,15 @@ formWarga.addEventListener('submit', (e) => {
     formWarga.reset();
     anggotaContainer.innerHTML = '';
     displayData();
-});
 
+    // Alert sukses setelah menambahkan data
+    Swal.fire({
+        icon: 'success',
+        title: 'Sukses!',
+        text: 'Data warga berhasil ditambahkan.',
+        confirmButtonText: 'OK'
+    });
+});
 
 // Ambil elemen sidebar dan tombol toggle
 const sidebar = document.getElementById('sidebar');
@@ -211,20 +244,27 @@ displayData();
 
 // Fungsi untuk menghapus data warga
 function hapusWarga(index) {
-    dataWarga.splice(index, 1);
-    localStorage.setItem('dataWarga', JSON.stringify(dataWarga));
-    displayData();
-}
+    Swal.fire({
+        title: 'Konfirmasi Hapus',
+        text: 'Apakah Anda yakin ingin menghapus data ini?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Hapus',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            dataWarga.splice(index, 1);
+            localStorage.setItem('dataWarga', JSON.stringify(dataWarga));
+            displayData();
 
-// Fungsi untuk mengekspor data sebagai file JSON
-function eksporData() {
-    const dataStr = JSON.stringify(dataWarga, null, 2);
-    const blob = new Blob([dataStr], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'data_warga.json';
-    a.click();
+            Swal.fire({
+                icon: 'success',
+                title: 'Sukses!',
+                text: 'Data warga berhasil dihapus.',
+                confirmButtonText: 'OK'
+            });
+        }
+    });
 }
 
 // Fungsi untuk mengimpor data dari file JSON
@@ -237,6 +277,14 @@ document.getElementById('import-btn').addEventListener('change', (e) => {
         dataWarga = importedData;
         localStorage.setItem('dataWarga', JSON.stringify(dataWarga));
         displayData();
+
+        // Alert sukses setelah impor
+        Swal.fire({
+            icon: 'success',
+            title: 'Sukses!',
+            text: 'Data warga berhasil diimpor.',
+            confirmButtonText: 'OK'
+        });
     };
 
     reader.readAsText(file);
