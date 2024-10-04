@@ -20,27 +20,36 @@ function toggleNav() {
 // Tambahkan event listener untuk tombol toggle
 toggleNavBtn.addEventListener('click', toggleNav);
 
-// Fungsi untuk mendeteksi apakah perangkat adalah desktop
-function isDesktop() {
-    return window.innerWidth > 1024;
-}
+// Swipe detection for mobile (touch events)
+let touchStartX = 0;
+let touchEndX = 0;
 
-// Peringatan untuk desktop
-if (isDesktop()) {
-    Swal.fire({
-        title: 'Tidak berfungsi di desktop',
-        text: 'Aplikasi ini hanya bisa diakses di tablet atau smartphone.',
-        icon: 'warning',
-        confirmButtonText: 'Tutup',
-        allowOutsideClick: false,
-        backdrop: `rgba(0,0,0,0.8)`,
-        customClass: {
-            popup: 'blur-lg'
+// Fungsi untuk mendeteksi swipe ke kanan/kiri
+function handleSwipe() {
+    document.addEventListener('touchstart', (e) => {
+        touchStartX = e.changedTouches[0].screenX;
+    });
+
+    document.addEventListener('touchend', (e) => {
+        touchEndX = e.changedTouches[0].screenX;
+        if (touchStartX < touchEndX - 50) {
+            // Swipe ke kanan (tampilkan navigasi)
+            isNavOpen = true;
+            sidebar.classList.remove('nav-hidden');
+            sidebar.classList.add('nav-visible');
+            toggleNavBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
+        } else if (touchStartX > touchEndX + 50) {
+            // Swipe ke kiri (sembunyikan navigasi)
+            isNavOpen = false;
+            sidebar.classList.remove('nav-visible');
+            sidebar.classList.add('nav-hidden');
+            toggleNavBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
         }
-    }).then(() => {
-        document.body.innerHTML = ""; // Hapus konten halaman setelah peringatan
     });
 }
+
+// Panggil fungsi handleSwipe
+handleSwipe();
 
 // Data warga di localStorage
 let dataWarga = JSON.parse(localStorage.getItem('dataWarga')) || [];
@@ -68,7 +77,7 @@ function displayData(filteredData = dataWarga) {
 
     filteredData.forEach((warga, index) => {
         const card = document.createElement('div');
-        card.classList.add('bg-white', 'p-4', 'rounded', 'shadow-lg', 'long-press');
+        card.classList.add('bg-white', 'p-4', 'rounded', 'shadow-lg');
         card.innerHTML = `
             <h2 class="text-xl font-bold">${warga.namaKepala}</h2>
             <p>Nomor KK: ${warga.nomorKK}</p>
@@ -79,21 +88,19 @@ function displayData(filteredData = dataWarga) {
             </ul>
             <p class="mt-2">Alamat: ${warga.alamat}</p>
             <p>Keterangan: ${warga.keterangan}</p>
+            <button class="text-blue-500" onclick="editWarga(${index})">
+                <i class="fas fa-edit"></i>
+            </button>
+            <button class="text-red-500" onclick="hapusWarga(${index})">
+                <i class="fas fa-trash"></i>
+            </button>
         `;
-
-        // Tombol hapus dengan swipe
-        const deleteBtn = document.createElement('button');
-        deleteBtn.classList.add('text-red-500', 'absolute', 'top-2', 'right-2');
-        deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
-        deleteBtn.addEventListener('click', () => hapusWarga(index));
-        card.appendChild(deleteBtn);
 
         cardContainer.appendChild(card);
     });
 
     // Perbarui penghitung
     updateCounter();
-    handleSwipe(); // Panggil fungsi handleSwipe setelah menampilkan data
 }
 
 // Fungsi untuk menambahkan anggota keluarga baru di form
@@ -267,24 +274,6 @@ exportBtn.addEventListener('click', () => {
 });
 
 // Fitur long-press untuk mengedit data
-document.addEventListener('mousedown', handleMouseDown);
-document.addEventListener('mouseup', handleMouseUp);
-
-let pressTimer;
-
-function handleMouseDown(e) {
-    if (e.target.classList.contains('long-press')) {
-        pressTimer = setTimeout(() => {
-            const index = Array.from(cardContainer.children).indexOf(e.target);
-            editWarga(index);
-        }, 4000); // 4 detik
-    }
-}
-
-function handleMouseUp() {
-    clearTimeout(pressTimer);
-}
-
 function editWarga(index) {
     const warga = dataWarga[index];
     
@@ -338,28 +327,6 @@ function updateWarga(index) {
         title: 'Sukses!',
         text: 'Data warga berhasil diperbarui.',
         confirmButtonText: 'OK'
-    });
-}
-
-// Swipe detection for mobile (touch events)
-let touchStartX = 0;
-let touchEndX = 0;
-
-// Fungsi untuk mendeteksi swipe ke kanan untuk menghapus cardbox
-function handleSwipe() {
-    const cards = document.querySelectorAll('#card-container > div');
-    cards.forEach((card, index) => {
-        card.addEventListener('touchstart', (e) => {
-            touchStartX = e.changedTouches[0].screenX;
-        });
-
-        card.addEventListener('touchend', (e) => {
-            touchEndX = e.changedTouches[0].screenX;
-            if (touchStartX < touchEndX - 50) {
-                // Swipe ke kanan (hapus card)
-                hapusWarga(index);
-            }
-        });
     });
 }
 
